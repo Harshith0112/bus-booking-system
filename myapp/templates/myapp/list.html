@@ -1,0 +1,126 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+<div class="container">
+    <h3>{{ msg }}</h3>
+    <h2>List of buses</h2>
+    <table class="table table-striped">
+        <!-- Table Header -->
+        <thead style="background-color: blue; color: white;">
+            <th>ID</th>
+            <th>NAME</th>
+            <th>SOURCE</th>
+            <th>DESTINATION</th>
+            <th>NUM OF SEATS</th>
+            <th>NUM OF SEATS REM</th>
+            <th>PRICE</th>
+            <th>DATE</th>
+            <th>TIME</th>
+            <th>Select</th> <!-- Add a new column for radio buttons -->
+        </thead>
+        <tbody>
+            {% for row in bus_list %}
+            <tr>
+                <!-- Table Data -->
+                <td>{{ row.id }}</td>
+                <td>{{ row.bus_name }}</td>
+                <td>{{ row.source }}</td>
+                <td>{{ row.dest }}</td>
+                <td>{{ row.nos }}</td>
+                <td>{{ row.rem }}</td>
+                <td>{{ row.price }}</td>
+                <td>{{ row.date }}</td>
+                <td>{{ row.time }}</td>
+                <td><input type="radio" name="bus_id" value="{{ row.id }}" onchange="updateBusId(this.value)"></td> <!-- Add radio button -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Booking Form -->
+    <form action="{% url 'bookings' %}" method="post" id="bookingForm" onsubmit="return validateBooking()">
+        <h3>Choose bus to book</h3>
+        {% csrf_token %}
+        {% if error_msg %}
+            <p style="color: red;">{{ error_msg }}</p>
+        {% endif %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Bus ID</th>
+                    <th>Number of seats</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input name='bus_id' class="form-control" type="number" id="busIdInput" readonly> <!-- Make it readonly to prevent direct input -->
+                    </td>
+                    <td>
+                        <input name='no_seats' class="form-control" type="number" id="seatCountInput" onchange="generatePassengerFields()" disabled> <!-- Disable until bus is selected -->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Passenger Details Fields -->
+        <div id="passengerDetails"></div>
+        <div class="pull-right">
+            <button type="submit" class="btn btn-success float-left">Book bus</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function generatePassengerFields() {
+        var seatCount = document.getElementById("seatCountInput").value;
+        var passengerDetailsDiv = document.getElementById("passengerDetails");
+        passengerDetailsDiv.innerHTML = ""; // Clear previous fields
+
+        for (var i = 0; i < seatCount; i++) {
+            var passengerFieldset = document.createElement("fieldset");
+            passengerFieldset.innerHTML = `
+                <legend>Passenger ${i + 1}</legend>
+                <div class="form-group">
+                    <label for="passengerName${i}">Name</label>
+                    <input type="text" class="form-control" id="passengerName${i}" name="passenger_name${i}">
+                </div>
+                <div class="form-group">
+                    <label for="passengerAge${i}">Age</label>
+                    <input type="number" class="form-control" id="passengerAge${i}" name="passenger_age${i}">
+                </div>
+                <div class="form-group">
+                    <label for="passengerGender${i}">Gender</label>
+                    <select class="form-control" id="passengerGender${i}" name="passenger_gender${i}">
+                        <option value="">None</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <!-- Add more fields as needed -->
+            `;
+            passengerDetailsDiv.appendChild(passengerFieldset);
+        }
+    }
+
+    function updateBusId(busId) {
+        document.getElementById("busIdInput").value = busId;
+        document.getElementById("seatCountInput").disabled = false; // Enable seat count input when bus is selected
+    }
+
+    function validateBooking() {
+        var busId = document.querySelector('input[name="bus_id"]:checked');
+        var seatCount = document.getElementById("seatCountInput").value;
+
+        if (!busId) {
+            alert("Please select a bus to book.");
+            return false;
+        }
+
+        if (!seatCount || seatCount <= 0) {
+            alert("Please enter a valid number of seats.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{% endblock %}

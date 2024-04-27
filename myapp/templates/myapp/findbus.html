@@ -1,0 +1,63 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+{% load static %}
+<style>
+    body {
+        background-image: url('{% static 'images/buses.jpg' %}');
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 mx-auto" style="margin-top: 70px">
+            <h2>Find bus</h2>
+            <form action="{% url 'findbus' %}" method="post" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="example-email-input" class="col-2 col-form-label">From</label>
+                    <div class="col-10">
+                        <input name='source' class="form-control" type="text" id="example-email-input">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="example-email-input" class="col-2 col-form-label">Destination</label>
+                    <div class="col-10">
+                        <input name='destination' class="form-control" type="text">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="example-email-input" class="col-2 col-form-label">Date</label>
+                    <div class="col-10">
+                        <!-- Set the date input value to today's date -->
+                        <input name='date' class="form-control" type="date" id="example-date-input" min="2024-04-27" value="{{ today }}">
+                    </div>
+                </div>
+                <div id="date-error" style="color: red; display: none;">Please select a date equal to or after today.</div>
+                <div class="pull-right">
+                    <button type="submit" class="btn btn-success float-right">Find bus</button>
+                </div>
+                {{ error }}
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get today's date in the user's local time zone
+    var today = new Date().toISOString().split('T')[0];
+
+    function validateForm() {
+        var selectedDate = document.getElementById("example-date-input").value;
+        if (selectedDate < today) {
+            document.getElementById("date-error").style.display = "block";
+            return false; // Prevent form submission
+        } else {
+            document.getElementById("date-error").style.display = "none";
+            return true; // Allow form submission
+        }
+    }
+</script>
+
+{% endblock %}

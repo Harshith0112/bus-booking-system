@@ -1,0 +1,69 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+{% load static %}
+<style>
+    body {
+        background-image: url('{% static 'images/buses.jpg' %}');
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 mx-auto" style="margin-top: 70px">
+            <form action="{% url 'signup' %}" method="post" onsubmit="return validatePassword()">
+                <h2>Sign up!</h2>
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="example-email-input" class="col-2 col-form-label" style="color: black;">Email:</label>
+                    <div class="col-10">
+                        <input name='email' class="form-control" type="email" id="example-email-input" required placeholder="Enter your email">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="example-email-input" class="col-2 col-form-label">Username:</label>
+                    <div class="col-10">
+                        <input name='name' class="form-control" type="text" required placeholder="Enter your username">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="example-email-input" class="col-2 col-form-label">Password:</label>
+                    <div class="col-10">
+                        <div class="input-group">
+                            <input name='password' id="password" class="form-control" type="password" required minlength="8" placeholder="Enter your password">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="showPasswordBtn">
+                                    Show
+                                </button>
+                            </div>
+                        </div>
+                        <small id="passwordHelpBlock" class="form-text text-muted" style="color:black;">
+                          Password must contain at least 8 characters including uppercase, lowercase letters, numbers, and special characters.
+                            </small>
+
+                    </div>
+                </div>
+                <div class="pull-right">
+                    <button type="submit" class="btn btn-success float-right">Sign up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var passwordField = document.getElementById("password");
+    var showPasswordBtn = document.getElementById("showPasswordBtn");
+
+    showPasswordBtn.addEventListener("click", function() {
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            showPasswordBtn.textContent = "Hide";
+        } else {
+            passwordField.type = "password";
+            showPasswordBtn.textContent = "Show";
+        }
+    });
+</script>
+
+{% endblock %}

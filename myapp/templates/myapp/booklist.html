@@ -1,0 +1,91 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+<div class="container">
+    <h3>{{ msg }}</h3>
+    <h2>List of booked buses</h2>
+    <table class="table table-striped">
+        <thead style="background-color: blue; color: white;">
+            <th>BOOKING ID</th>
+            <th>USER NAME</th>
+            <th>BUS NAME</th>
+            <th>SOURCE</th>
+            <th>DESTINATION</th>
+            <th>NUM OF SEATS</th>
+            <th>PRICE</th>
+            <th>DATE</th>
+            <th>TIME</th>
+            <th>STATUS</th>
+            <th>Select</th> <!-- Add a new column for radio buttons -->
+        </thead>
+        <tbody>
+            {% for row in book_list %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.bus_name }}</td>
+                <td>{{ row.source }}</td>
+                <td>{{ row.dest }}</td>
+                <td>{{ row.nos }}</td>
+                <td>{{ row.price }}</td>
+                <td>{{ row.date }}</td>
+                <td>{{ row.time }}</td>
+                <td>{{ row.status }}</td>
+                <td>
+                    {% if row.status != 'CANCELLED' %}
+                        <input type="radio" name="bus_id" value="{{ row.id }}" onchange="updateBusId(this.value)">
+                    {% endif %}
+                </td> <!-- Add radio button -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form action="{% url 'cancellings' %}" method="post" onsubmit="return validateForm()">
+        <h3>Choose bus to cancel</h3>
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Bus ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input name='bus_id' class="form-control" type="number" id="example-email-input" readonly> <!-- Make it readonly to prevent direct input -->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pull-right">
+            <button type="submit" class="btn btn-danger float-left">Cancel bus</button>
+        </div>
+        {{ error }}
+    </form>
+</div>
+
+<script>
+    function updateBusId(busId) {
+        document.getElementById("example-email-input").value = busId;
+    }
+
+    function validateForm() {
+        var radioButtons = document.getElementsByName('bus_id');
+        var isChecked = false;
+
+        for (var i = 0; i < radioButtons.length; i++) {
+            if (radioButtons[i].checked) {
+                isChecked = true;
+                break;
+            }
+        }
+
+        if (!isChecked) {
+            alert("Please select a bus to cancel.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{% endblock %}

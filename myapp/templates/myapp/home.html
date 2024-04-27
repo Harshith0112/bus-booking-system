@@ -1,0 +1,88 @@
+{% extends 'myapp/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body {
+        background-image: url('{% static 'images/bus.jpg' %}');
+        background-size: cover;
+        background-position: center;
+        height: 100vh; /* Ensure full viewport height */
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+    }
+
+    .text-white {
+        color: white; /* Set text color to white */
+    }
+
+    /* Form container styles */
+    .form-container {
+        margin-top: 50px;
+        margin-left: 6px; /* Adjust the left margin to position the form to the left */
+    }
+
+    /* Style for text fields */
+    .form-control {
+        width: 75%;
+        margin-bottom: 10px;
+    }
+
+    /* Style for the "Find bus" button */
+    .find-bus-button {
+        width: 25%;
+    }
+
+    /* Style for form labels */
+    .form-group label {
+        color: white; /* Set label text color to white */
+    }
+</style>
+
+<div class="container form-container">
+    <div class="row">
+        <div class="col-sm-6 mx-auto">
+            <h2 class="text-white">Find bus</h2>
+            <form action="{% url 'findbus1' %}" method="post" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="example-email-input">From</label>
+                    <input name='source' class="form-control" type="text" id="example-email-input">
+                </div>
+                <div class="form-group">
+                    <label for="example-email-input">Destination</label>
+                    <input name='destination' class="form-control" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="example-date-input">Date</label>
+                    <input name='date' class="form-control" type="date" id="example-date-input">
+                    <div id="date-error" style="color: red; display: none;">Please select a date equal to or after today.</div>
+                </div>
+                <button type="submit" class="btn btn-success find-bus-button">Find bus</button>
+                {{ error }}
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var today = new Date();
+    var nextDay = new Date(today);
+    nextDay.setDate(nextDay.getDate() + 1); // Get the next day
+    var minDate = nextDay.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+    document.getElementById("example-date-input").setAttribute('min', minDate);
+
+    function validateForm() {
+        var selectedDate = document.getElementById("example-date-input").value;
+        if (selectedDate < minDate) {
+            document.getElementById("date-error").style.display = "block";
+            return false; // Prevent form submission
+        } else {
+            document.getElementById("date-error").style.display = "none";
+            return true; // Allow form submission
+        }
+    }
+</script>
+
+{% endblock %}
